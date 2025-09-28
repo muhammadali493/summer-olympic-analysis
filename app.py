@@ -110,3 +110,28 @@ if user_menu == 'Overall Analysis':
     selected_sport = st.selectbox('Select the Sport', sport_list)
     top_athletes = helper.most_successful(df,selected_sport)
     st.table(top_athletes)
+
+if user_menu == 'Country-wise Analysis':
+
+    st.sidebar.title('Country-wise Analysis')
+    country_list = df['region'].dropna().unique().tolist()
+    country_list.sort()
+    selected_country = st.sidebar.selectbox('Select the country', country_list)
+    country_df = helper.yearwise_medal_tally(df, selected_country)
+    fig, ax = plt.subplots()
+    ax.plot(country_df['Year'], country_df['Medal'], marker='o')
+    ax.set_title(f"Medals Over Time - {selected_country}")
+    ax.set_xlabel('Year')
+    ax.set_ylabel('Medals Won')
+
+    st.pyplot(fig)
+
+    pt = helper.country_event_heatmap(df, selected_country)
+    st.title(f"Performance in Each Sport over time - {selected_country}")
+    fig, ax = plt.subplots(figsize=(20,20))
+    ax = sns.heatmap(pt, annot=True)
+    st.pyplot(fig)
+
+    top_10 = helper.top_athletes_of_country(df, selected_country)
+    st.title(f'Top 10 athletes of {selected_country}')
+    st.table(top_10)

@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 def medal_tally(df):
     # drop duplicate rows for team events: Count a medal once for each team instead of all the player
     medal_tally = df.drop_duplicates(subset = ['Team', 'NOC', 'Games', 'Year', 'City', 'Sport', 'Event', 'Medal'])
@@ -57,3 +58,29 @@ def most_successful(df, sport):
         temp_df = temp_df[temp_df['Sport'] == sport]
 
     return temp_df['Name'].value_counts().reset_index().head(15).merge(df, left_on='Name', right_on='Name', how='left')[['Name', 'count', 'Sport', 'region']].drop_duplicates('Name')
+
+def yearwise_medal_tally(df, country):
+    # Drop rows where Medal is NaN
+    temp_df = df.dropna(subset=['Medal'])
+    # Drop duplicate rows for team events
+    temp_df.drop_duplicates(subset=['Team', 'NOC', 'Games', 'Year', 'City', 'Sport', 'Event', 'Medal'], inplace = True)
+    new_df = temp_df[temp_df['region'] == country]
+    final_df = new_df.groupby('Year').count()['Medal'].reset_index()
+    return final_df
+
+def country_event_heatmap(df, country):
+    # Drop rows where Medal is NaN
+    temp_df = df.dropna(subset=['Medal'])
+    # Drop duplicate rows for team events
+    temp_df.drop_duplicates(subset=['Team', 'NOC', 'Games', 'Year', 'City', 'Sport', 'Event', 'Medal'], inplace = True)
+    new_df = temp_df[temp_df['region'] == country]
+    plt.figure(figsize=(20,20))
+    pt = new_df.pivot_table(index='Sport', columns='Year', values='Medal', aggfunc='count').fillna(0)
+    return pt
+
+def top_athletes_of_country(df, country):
+    # Drop atheletes with no medal
+    temp_df = df.dropna(subset=['Medal'])
+    temp_df = temp_df[temp_df['region'] == country]
+
+    return temp_df['Name'].value_counts().reset_index().head(10).merge(df, left_on='Name', right_on='Name', how='left')[['Name', 'count', 'Sport']].drop_duplicates('Name')
