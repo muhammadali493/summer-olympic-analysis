@@ -3,6 +3,8 @@ import pandas as pd
 import preprocessor, helper
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotly.figure_factory as ff
+import plotly.express as px
 
 df = pd.read_csv('data\\athlete_events.csv')
 region_df = pd.read_csv('data\\noc_regions.csv')
@@ -135,3 +137,20 @@ if user_menu == 'Country-wise Analysis':
     top_10 = helper.top_athletes_of_country(df, selected_country)
     st.title(f'Top 10 athletes of {selected_country}')
     st.table(top_10)
+
+if user_menu == 'Athelete-wise Analysis':
+    # Remove duplicate names of Atheletess
+    st.title("Age Distribution of Atheletes")
+    athelete_df = df.drop_duplicates(subset=['Name', 'region'])
+    all_athelete_age = athelete_df['Age'].dropna()
+    gold_age = athelete_df[athelete_df['Medal'] == 'Gold']['Age'].dropna()
+    silver_age = athelete_df[athelete_df['Medal'] == 'Silver']['Age'].dropna()
+    bronze_age = athelete_df[athelete_df['Medal'] == 'Bronze']['Age'].dropna()
+    figure = ff.create_distplot([all_athelete_age, gold_age, silver_age, bronze_age], ['Overall Age', 'Gold Medalist', 'Silver Medalist', 'Bronze Medalist'], show_hist=False, show_rug=False)
+    figure.update_layout(autosize=False, width=1000, height=500)
+    st.plotly_chart(figure)
+
+    st.title("Men vs Women Participation")
+    final = helper.men_vs_women(df)
+    fig = px.line(final, x='Year', y=['Male', 'Female'])
+    st.plotly_chart(fig)

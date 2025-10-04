@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import streamlit as st
 def medal_tally(df):
     # drop duplicate rows for team events: Count a medal once for each team instead of all the player
     medal_tally = df.drop_duplicates(subset = ['Team', 'NOC', 'Games', 'Year', 'City', 'Sport', 'Event', 'Medal'])
@@ -25,7 +26,7 @@ def country_year_list(df):
     country.insert(0, "Overall")
 
     return years, country
-
+@st.cache_data
 def fetch_medal_tally(df, year, country):
     medal_df = df.drop_duplicates(subset = ['Team', 'NOC', 'Games', 'Year', 'City', 'Sport', 'Event', 'Medal'])
     flag = False
@@ -84,3 +85,13 @@ def top_athletes_of_country(df, country):
     temp_df = temp_df[temp_df['region'] == country]
 
     return temp_df['Name'].value_counts().reset_index().head(10).merge(df, left_on='Name', right_on='Name', how='left')[['Name', 'count', 'Sport']].drop_duplicates('Name')
+
+def men_vs_women(df):
+    athelete_df = df.drop_duplicates(subset=['Name', 'region'])
+    men = athelete_df[athelete_df['Sex'] == 'M'].groupby('Year').count()['Name'].reset_index()
+    women = athelete_df[athelete_df['Sex'] == 'F'].groupby('Year').count()['Name'].reset_index()
+    final = men.merge(women, on = 'Year', how='left')
+    final.rename(columns={'Name_x':'Male', 'Name_y':'Female'}, inplace=True)
+    final.fillna(0, inplace=True)
+    return final
+    
