@@ -131,9 +131,12 @@ if user_menu == 'Country-wise Analysis':
 
     pt = helper.country_event_heatmap(df, selected_country)
     st.title(f"Performance in Each Sport over time - {selected_country}")
-    fig, ax = plt.subplots(figsize=(20,20))
-    ax = sns.heatmap(pt, annot=True)
-    st.pyplot(fig)
+    if pt.empty:
+        st.warning("No data Available for this Country.")
+    else:
+        fig, ax = plt.subplots(figsize=(20,20))
+        ax = sns.heatmap(pt, annot=True)
+        st.pyplot(fig)
 
     top_10 = helper.top_athletes_of_country(df, selected_country)
     st.title(f'Top 10 athletes of {selected_country}')
