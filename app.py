@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import pandas as pd
 import preprocessor, helper
@@ -6,8 +7,8 @@ import seaborn as sns
 import plotly.figure_factory as ff
 import plotly.express as px
 
-df = pd.read_csv('data\\athlete_events.csv')
-region_df = pd.read_csv('data\\noc_regions.csv')
+df = pd.read_csv(os.path.join("data", "athelete_events.csv"))
+region_df = pd.read_csv(os.path.join("data", "noc_regions.csv"))
 
 df = preprocessor.preprocess(df, region_df)
 
